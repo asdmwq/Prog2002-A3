@@ -1,0 +1,298 @@
+<!-- ======================= top bar ======================= -->
+<header class="topbar">
+  <div class="inner">
+    <a class="brand" href="/">
+      <svg class="brand-mark" width="38" height="38" viewBox="0 0 40 40" aria-hidden="true">
+        <rect width="40" height="40" rx="11" fill="#0e7a6b"/>
+        <path d="M20 30s-9.2-5.9-11.4-10.4C7 16.4 8.6 13.4 11.4 13c1.9-.3 3.5.8 4.9 2.2l.2.2.2-.2C18.1 13.8 19.7 12.7 21.6 13c2.8.4 4.4 3.4 2.8 6.6C22.2 24.1 20 30 20 30z" fill="#fff"/>
+        <path d="M13 22.5h14" stroke="#f4c56a" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-text"><strong>HeartBridge</strong><small>Admin Dashboard</small></span>
+    </a>
+    <div class="top-actions">
+      <a class="btn btn-ghost" [href]="publicHref" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14 21 3"/></svg>
+        Open public site
+      </a>
+      <button class="btn btn-primary" type="button" (click)="openCreate()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+        New event
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="admin-main">
+  <div class="page-head">
+    <h1>Events management</h1>
+    <p class="muted">Create, update, suspend and delete charity events, and review the registrations for each event.</p>
+  </div>
+
+  <!-- Summary statistics -->
+  <section class="stats">
+    <div class="stat-card"><div class="stat-label">Total events</div><div class="stat-value">{{ stats().total }}</div></div>
+    <div class="stat-card"><div class="stat-label">Upcoming</div><div class="stat-value stat-up">{{ stats().upcoming }}</div></div>
+    <div class="stat-card"><div class="stat-label">Past</div><div class="stat-value">{{ stats().past }}</div></div>
+    <div class="stat-card"><div class="stat-label">Suspended</div><div class="stat-value stat-susp">{{ stats().suspended }}</div></div>
+    <div class="stat-card"><div class="stat-label">Registrations</div><div class="stat-value">{{ stats().regs }}</div></div>
+    <div class="stat-card"><div class="stat-label">Tickets sold</div><div class="stat-value">{{ stats().tickets }}</div></div>
+  </section>
+
+  <!-- Events table -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>All events</h2>
+      <div class="table-filter">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#74857d" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" placeholder="Filter by name, city, host…" [value]="search()" (input)="onSearch($any($event.target).value)">
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="col-id">ID</th>
+            <th>Event</th>
+            <th>Date</th>
+            <th class="num">Price</th>
+            <th class="num">Raised / Goal</th>
+            <th class="num">Registrations</th>
+            <th>Status</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            <tr class="loading-row"><td colspan="8"><div class="spinner"></div></td></tr>
+          } @else if (loadError()) {
+            <tr class="loading-row"><td colspan="8"><div class="table-empty">Could not load events. Is the API running on port 3000?</div></td></tr>
+          } @else if (allEvents().length === 0) {
+            <tr class="loading-row"><td colspan="8"><div class="table-empty">No events yet. Click "New event" to create one.</div></td></tr>
+          } @else {
+            @for (e of filtered(); track e.event_id) {
+              <tr>
+                <td class="num">#{{ e.event_id }}</td>
+                <td>
+                  <div class="evt-cell">
+                    <img class="evt-thumb" [src]="imageUrl(e.image_url)" alt="" (error)="hideImg($event)">
+                    <div>
+                      <div class="evt-name">{{ e.event_name }}</div>
+                      <div class="evt-sub">{{ e.category_name }} &middot; {{ e.organisation_name }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ formatDateShort(e.event_date) }}</td>
+                <td class="num">{{ priceLabel(e) }}</td>
+                <td class="num">
+                  <div class="raised-cell">
+                    <div class="raised-num">{{ formatMoney(e.current_amount) }} <span class="goal">/ {{ formatMoney(e.goal_amount) }}</span></div>
+                    <div class="mini-progress"><i [style.width.%]="percent(e)"></i></div>
+                  </div>
+                </td>
+                <td class="num">
+                  <span class="reg-count">{{ e.registration_count }}</span>
+                  <div class="reg-sub">{{ e.total_tickets || 0 }} tickets</div>
+                </td>
+                <td><span class="pill" [class.pill-up]="statusOf(e).key === 'up'" [class.pill-past]="statusOf(e).key === 'past'" [class.pill-susp]="statusOf(e).key === 'susp'">{{ statusOf(e).label }}</span></td>
+                <td>
+                  <div class="row-actions">
+                    <button class="btn btn-sm btn-edit" type="button" (click)="openEdit(e.event_id)">Edit</button>
+                    <button class="btn btn-sm btn-del" type="button" (click)="openDelete(e.event_id)">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+      @if (!loading() && !loadError() && allEvents().length > 0 && filtered().length === 0) {
+        <div class="table-empty">No events match your filter.</div>
+      }
+    </div>
+  </section>
+</main>
+
+<!-- ======================= create / edit modal ======================= -->
+<div class="modal-overlay" [class.open]="modalOpen()" (mousedown)="onOverlayClick('event', $event)">
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <h3>{{ modalTitle() }}</h3>
+      <button class="icon-btn" type="button" aria-label="Close" (click)="closeModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="alert" [class.show]="formError()">{{ formError() }}</div>
+
+      <form [formGroup]="form" novalidate (ngSubmit)="save()">
+        <fieldset>
+          <legend>Basic details</legend>
+          <div class="field">
+            <label for="fName">Event name *</label>
+            <input type="text" id="fName" formControlName="event_name" maxlength="200" placeholder="e.g. Liuzhou Charity Fun Run" [class.invalid]="fieldClass('event_name')">
+          </div>
+          <div class="field">
+            <label for="fDescription">Description *</label>
+            <textarea id="fDescription" rows="3" formControlName="event_description" maxlength="2000" placeholder="Describe what happens at the event…" [class.invalid]="fieldClass('event_description')"></textarea>
+          </div>
+          <div class="field">
+            <label for="fPurpose">Purpose *</label>
+            <textarea id="fPurpose" rows="2" formControlName="purpose" maxlength="2000" placeholder="What will the funds be used for?" [class.invalid]="fieldClass('purpose')"></textarea>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="fCategory">Category *</label>
+              <select id="fCategory" formControlName="category_id">
+                <option value="">Select a category…</option>
+                @for (c of categories(); track c.category_id) {
+                  <option [value]="c.category_id">{{ c.category_name }}</option>
+                }
+              </select>
+            </div>
+            <div class="field">
+              <label for="fOrg">Organisation *</label>
+              <select id="fOrg" formControlName="organisation_id">
+                <option value="">Select an organisation…</option>
+                @for (o of organisations(); track o.organisation_id) {
+                  <option [value]="o.organisation_id">{{ o.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Schedule &amp; venue</legend>
+          <div class="grid-3">
+            <div class="field">
+              <label for="fDate">Event date *</label>
+              <input type="date" id="fDate" formControlName="event_date">
+            </div>
+            <div class="field">
+              <label for="fStart">Start time *</label>
+              <input type="time" id="fStart" formControlName="start_time">
+            </div>
+            <div class="field">
+              <label for="fEnd">End time *</label>
+              <input type="time" id="fEnd" formControlName="end_time">
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="fLocation">Location *</label>
+              <input type="text" id="fLocation" formControlName="location" maxlength="200" placeholder="Venue / street" [class.invalid]="fieldClass('location')">
+            </div>
+            <div class="field">
+              <label for="fCity">City</label>
+              <input type="text" id="fCity" formControlName="city" maxlength="80" placeholder="e.g. Liuzhou">
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Fundraising</legend>
+          <div class="grid-3">
+            <div class="field">
+              <label for="fPrice">Ticket price (¥)</label>
+              <input type="number" id="fPrice" formControlName="ticket_price" min="0" step="0.01">
+            </div>
+            <div class="field">
+              <label for="fGoal">Goal amount (¥) *</label>
+              <input type="number" id="fGoal" formControlName="goal_amount" min="0" step="0.01">
+            </div>
+            <div class="field">
+              <label for="fRaised">Current amount (¥)</label>
+              <input type="number" id="fRaised" formControlName="current_amount" min="0" step="0.01">
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Map, image &amp; status</legend>
+          <div class="grid-3">
+            <div class="field">
+              <label for="fLat">Latitude</label>
+              <input type="number" id="fLat" formControlName="latitude" step="0.000001" min="-90" max="90" placeholder="24.325600">
+            </div>
+            <div class="field">
+              <label for="fLng">Longitude</label>
+              <input type="number" id="fLng" formControlName="longitude" step="0.000001" min="-180" max="180" placeholder="109.405000">
+            </div>
+            <div class="field">
+              <label for="fImage">Image URL</label>
+              <input type="text" id="fImage" formControlName="image_url" maxlength="500" placeholder="images/fun-run.svg">
+            </div>
+          </div>
+          <label class="check-field">
+            <input type="checkbox" formControlName="is_suspended">
+            <span>Suspend this event (hidden from the public website)</span>
+          </label>
+        </fieldset>
+
+        <!-- Registrations shown only when editing -->
+        @if (modalMode() === 'edit') {
+          @if (editingEvent(); as ev) {
+            <fieldset>
+              <legend>Recorded registrations</legend>
+              @if (!ev.registrations || ev.registrations.length === 0) {
+                <div class="regs-admin-head"><span class="regs-none">No registrations recorded yet.</span><b>0 total</b></div>
+              } @else {
+                <div class="regs-admin-head"><span class="regs-none">Full contact details are shown to administrators.</span><b>{{ ev.registrations.length }} people · {{ editTicketTotal() }} tickets</b></div>
+                <div style="overflow-x:auto">
+                  <table class="regs-admin-table">
+                    <thead>
+                      <tr>
+                        <th>Name</th><th>Email</th><th>Phone</th><th class="num">Tickets</th><th class="num">Total</th><th>Registered</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (r of ev.registrations; track r.registration_id) {
+                        <tr>
+                          <td>{{ r.first_name }} {{ r.last_name }}</td>
+                          <td>{{ r.email }}</td>
+                          <td>{{ r.phone || '–' }}</td>
+                          <td class="num">{{ r.ticket_count }}</td>
+                          <td class="num">{{ formatMoney(r.total_amount) }}</td>
+                          <td>{{ r.registered_at || '' }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+            </fieldset>
+          }
+        }
+      </form>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-ghost" type="button" (click)="closeModal()">Cancel</button>
+      <button class="btn btn-primary" type="button" [disabled]="saving()" (click)="save()">
+        {{ saving() ? 'Saving…' : 'Save event' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= delete confirmation ======================= -->
+<div class="modal-overlay" [class.open]="deleteOpen()" (mousedown)="onOverlayClick('delete', $event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Delete event</h3>
+    </div>
+    <div class="modal-body">
+      <p class="delete-msg">Are you sure you want to delete <b>{{ deleteName() }}</b> ({{ pendingDeleteId() ? '#' + pendingDeleteId() : '' }})? This cannot be undone.</p>
+      <div class="alert alert-danger" [class.show]="deleteError()">{{ deleteError() }}</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" type="button" (click)="closeDelete()">Cancel</button>
+      <button class="btn btn-danger" type="button" [disabled]="deleting()" (click)="confirmDelete()">
+        {{ deleting() ? 'Deleting…' : 'Delete event' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" [class.show]="toast().visible" [class.error]="toast().type === 'error'">{{ toast().message }}</div>

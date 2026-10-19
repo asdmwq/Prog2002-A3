@@ -1,22 +1,39 @@
 /**
- * server.js (admin application)
- * Serves the static admin dashboard (HTML/CSS/JS) on port 8090.
- * Express is only a static file host - the dashboard talks to the REST API
- * directly from the browser. No templating engine is used.
+ * server.js
+ * HeartBridge Admin Dashboard (Angular v22 + TypeScript production build).
+ *
+ * Serves the static browser bundle built by `ng build`
+ * (see dist/adminside/browser) and falls back to index.html.
+ *
+ * The data API is a separate Node.js app (see the "api" project).
+ *
+ * Run:   npm install && npm run build && npm start
+ * Port:  8090 by default (or process.env.PORT)
  */
-const path = require('path');
+
 const express = require('express');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 8090;
-const PUBLIC_DIR = path.join(__dirname, 'public');
+const DIST = path.join(__dirname, 'dist', 'adminside', 'browser');
 
-app.use(express.static(PUBLIC_DIR));
+app.use(express.static(DIST));
 
-app.use((req, res) => {
-  res.status(404).sendFile(path.join(PUBLIC_DIR, 'index.html'));
+app.get('/api', (req, res) => {
+  res.status(200).json({
+    message: 'This is the admin dashboard server. The data API runs in the separate "api" project.',
+  });
+});
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(DIST, 'index.html'));
 });
 
 app.listen(PORT, () => {
-  console.log(`HeartBridge admin dashboard running at http://localhost:${PORT}`);
+  console.log('============================================================');
+  console.log('  HeartBridge admin dashboard (Angular v22) is running');
+  console.log('  Open: http://localhost:' + PORT);
+  console.log('  Data API: http://localhost:3000/api (run the "api" project)');
+  console.log('============================================================');
 });

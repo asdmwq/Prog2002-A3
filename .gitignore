@@ -2,6 +2,9 @@
 node_modules/
 npm-debug.log*
 
+# Angular build cache
+.angular/
+
 # Environment / secrets
 .env
 .env.*
@@ -26,21 +29,36 @@ desktop.ini
 # MySQL local data (never commit database files)
 mysql-data/
 
-# Generated report render cache (local verification only)
+# Local-only helper scripts (machine-specific paths)
+start-all.cmd
+start-mysql.cmd
+video-checkpoint.cmd
+HOW TO OPEN.txt
+
+# Legacy A2/HTML versions kept locally only
+_legacy-clientside/
+_legacy-adminside/
+
+# Local working/verification files and document build scripts
 docs/render-*/
 docs/push-log.txt
-
-# A2 legacy files kept locally but not part of the A3 repository
 docs/build_report.py
+docs/build_report_a3.py
 docs/build_storyboard.py
+docs/build_speech_cao.py
 docs/make_erd.py
+docs/make_erd_a3.py
 docs/make_banners.py
+docs/SETUP-GUIDE.md
+docs/VIDEO-SCRIPT.md
+docs/VIDEO-CHECKPOINT.txt
+docs/ng-home.png
+docs/ng-build-*.log
+docs/ng-new-*.log
+docs/npm-install-*.log
 docs/PROG2002 A2 Report.docx
 docs/PROG2002 A2 Storyboard.docx
+docs/PROG2002 A3 Demo Speech - CAO XiangXin.docx
 
-# A2-era screenshots and image tiles kept locally; A3 uses only docs/shots/a3/
-docs/shots/_tiles/
-docs/shots/*.png
-
-# Duplicate / intermediate screenshots (byte-identical copy)
-docs/shots/a3/a3-success-check.png
+# Screenshot working copies (the final images are embedded in the report)
+docs/shots/

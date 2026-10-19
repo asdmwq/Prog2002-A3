@@ -1,0 +1,128 @@
+<section class="page-band">
+  <div class="container">
+    <span class="eyebrow">Register</span>
+    <h1>Event Registration</h1>
+    <p>Complete the form to reserve your place. Your registration is saved instantly.</p>
+  </div>
+</section>
+
+<div class="container">
+  @if (state() === 'loading') {
+    <app-state-box kind="loading" message="Loading event details&hellip;"></app-state-box>
+  }
+
+  @if (state() === 'notfound') {
+    <div class="detail-notfound">
+      <div class="big">?</div>
+      <p>{{ notFoundText() }}</p>
+      <a class="btn btn-primary" routerLink="/search">Search active events</a>
+    </div>
+  }
+
+  @if (state() === 'ready' || state() === 'success') {
+    @if (event(); as ev) {
+      <div class="register-grid">
+        <!-- event summary -->
+        <aside class="reg-summary">
+          <img class="banner-lg" [src]="imageUrl(ev.image_url)" [alt]="ev.event_name">
+          <div class="badges">
+            <span class="badge badge-cat">{{ ev.category_name }}</span>
+            <span class="badge badge-up">{{ ev.event_status }}</span>
+          </div>
+          <h2>{{ ev.event_name }}</h2>
+          <ul class="reg-summary-meta">
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0e7a6b" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> {{ formatDateLong(ev.event_date) }} &middot; {{ ev.start_time }}&ndash;{{ ev.end_time }}</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0e7a6b" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg> {{ ev.location }}, {{ ev.city }}</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0e7a6b" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg> Hosted by {{ ev.organisation_name }}</li>
+          </ul>
+          <p class="purpose">{{ ev.purpose }}</p>
+          <div class="price-line">
+            <span class="k">Ticket price</span>
+            <span class="v" [class.free]="isFree(ev)">
+              {{ isFree(ev) ? 'Free entry' : formatMoney(ev.ticket_price) }}
+            </span>
+          </div>
+          <div class="price-line">
+            <span class="k">Already registered</span>
+            <span class="v">{{ ev.registration_count }} people &middot; {{ ev.total_tickets }} tickets</span>
+          </div>
+          <div class="price-line">
+            <span class="k">Your total</span>
+            <span class="v" id="liveTotal">{{ formatMoney(total()) }}</span>
+          </div>
+        </aside>
+
+        <!-- registration form -->
+        @if (state() === 'ready') {
+          <section class="reg-form-card">
+            <h2>Your details</h2>
+            <p class="muted">Fields marked <span class="req">*</span> are required.</p>
+            <div class="form-error" [class.show]="formError()">{{ formError() }}</div>
+            <div class="form-error" [class.show]="apiError()">{{ apiError() }}</div>
+
+            <form [formGroup]="form" novalidate (ngSubmit)="onSubmit()">
+              <fieldset class="grid-2">
+                <div class="field">
+                  <label for="firstName">First name <span class="req">*</span></label>
+                  <input type="text" id="firstName" formControlName="first_name" autocomplete="given-name" maxlength="80">
+                </div>
+                <div class="field">
+                  <label for="lastName">Last name <span class="req">*</span></label>
+                  <input type="text" id="lastName" formControlName="last_name" autocomplete="family-name" maxlength="80">
+                </div>
+              </fieldset>
+              <div class="field">
+                <label for="email">Email address <span class="req">*</span></label>
+                <input type="email" id="email" formControlName="email" autocomplete="email" maxlength="150" placeholder="name@example.com">
+              </div>
+              <div class="field">
+                <label for="phone">Phone number <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+                <input type="tel" id="phone" formControlName="phone" autocomplete="tel" maxlength="30" placeholder="e.g. 138 0000 0000">
+              </div>
+              <div class="field">
+                <label for="tickets">Number of tickets <span class="req">*</span></label>
+                <div class="tickets-row">
+                  <input type="number" id="tickets" formControlName="ticket_count" min="1" max="20" step="1" (input)="onTicketsChange($any($event.target).value)">
+                  <span class="tickets-hint">1&ndash;20 tickets per person &middot; total: <b>{{ formatMoney(total()) }}</b></span>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+                  {{ submitting() ? 'Submitting…' : 'Confirm Registration' }}
+                </button>
+                <a class="btn btn-outline" [routerLink]="['/event', ev.event_id]">Cancel</a>
+              </div>
+              <p class="secure-note">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0e7a6b" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Your details are used only to confirm your place and are not shared publicly.
+              </p>
+            </form>
+          </section>
+        }
+
+        <!-- success -->
+        @if (state() === 'success') {
+          @if (registration(); as r) {
+            <section class="reg-complete">
+              <div class="check">&#10003;</div>
+              <h2>Registration successful!</h2>
+              <p class="muted">Thank you for registering for <b>{{ ev.event_name }}</b>. A confirmation has been recorded for your email.</p>
+              <div class="success-card">
+                <div class="success-row"><span class="k">Name</span><span class="v">{{ r.first_name }} {{ r.last_name }}</span></div>
+                <div class="success-row"><span class="k">Email</span><span class="v">{{ r.email }}</span></div>
+                <div class="success-row"><span class="k">Phone</span><span class="v">{{ r.phone || 'Not provided' }}</span></div>
+                <div class="success-row"><span class="k">Tickets</span><span class="v">{{ r.ticket_count }}</span></div>
+                <div class="success-row"><span class="k">Total amount</span><span class="v">{{ formatMoney(r.total_amount) }}</span></div>
+                <div class="success-row"><span class="k">Registered</span><span class="v">{{ registeredDate() }}</span></div>
+              </div>
+              <div class="form-actions">
+                <a class="btn btn-primary" [routerLink]="['/event', ev.event_id]">View event details</a>
+                <a class="btn btn-outline" routerLink="/search">Search more events</a>
+              </div>
+            </section>
+          }
+        }
+      </div>
+    }
+  }
+</div>

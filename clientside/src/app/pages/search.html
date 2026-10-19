@@ -1,0 +1,74 @@
+<!-- ======================= page band ======================= -->
+<section class="page-band">
+  <div class="container">
+    <span class="eyebrow">Event Search</span>
+    <h1>Find the right charity event</h1>
+    <p>Use one, two or all three filters to discover active upcoming events across Liuzhou.</p>
+  </div>
+</section>
+
+<!-- ======================= filter card ======================= -->
+<div class="container">
+  <form class="filter-card" [formGroup]="form" novalidate (ngSubmit)="onSubmit()">
+    <div class="form-error" [class.show]="formError()">{{ formError() }}</div>
+    <div class="filter-fields">
+      <div class="field">
+        <label for="fDate">Date <span style="font-weight:400;color:var(--muted)">(on or after)</span></label>
+        <input type="date" id="fDate" formControlName="date" [min]="today">
+      </div>
+      <div class="field">
+        <label for="fLocation">Location</label>
+        <input type="text" id="fLocation" formControlName="location" maxlength="100" placeholder="e.g. Binjiang, Lotus Villa, People's Square">
+      </div>
+      <div class="field">
+        <label for="fCategory">Category</label>
+        <select id="fCategory" formControlName="category_id">
+          <option value="">All categories</option>
+          @for (c of categories(); track c.category_id) {
+            <option [value]="c.category_id">{{ c.category_name }} ({{ c.active_event_count }} active)</option>
+          }
+        </select>
+      </div>
+    </div>
+    <div class="filter-actions">
+      <button type="submit" class="btn btn-primary">Search Events</button>
+      <button type="button" class="btn btn-outline" (click)="clearFilters()">Clear Filters</button>
+    </div>
+  </form>
+</div>
+
+<!-- ======================= results ======================= -->
+<section class="section">
+  <div class="container">
+    <div class="results-head">
+      <div>
+        <span class="eyebrow eyebrow--brand">Results</span>
+        <h2>Search Results</h2>
+      </div>
+      <span class="results-count">{{ resultsCount() }}</span>
+    </div>
+
+    @switch (state()) {
+      @case ('prompt') {
+        <p class="results-prompt">{{ promptText() }}</p>
+      }
+      @case ('loading') {
+        <app-state-box kind="loading" message="Searching events&hellip;"></app-state-box>
+      }
+      @case ('error') {
+        <app-state-box kind="error" [message]="promptText()"></app-state-box>
+      }
+      @case ('results') {
+        @if (results().length === 0) {
+          <app-state-box kind="empty" message="No active events match your filters. Try removing one or more criteria."></app-state-box>
+        } @else {
+          <div class="events-grid">
+            @for (ev of results(); track ev.event_id) {
+              <app-event-card [event]="ev" />
+            }
+          </div>
+        }
+      }
+    }
+  </div>
+</section>
