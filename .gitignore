@@ -27,7 +27,8 @@ desktop.ini
 mysql-data/
 
 # Generated report render cache (local verification only)
-docs/render-a3/
+docs/render-*/
+docs/push-log.txt
 
 # A2 legacy files kept locally but not part of the A3 repository
 docs/build_report.py

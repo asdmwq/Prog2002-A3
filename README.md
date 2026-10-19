@@ -146,6 +146,7 @@ from public queries but remain visible in the admin dashboard.
 ## Submission contents
 
 - Three Node.js apps (**api**, **clientside**, **adminside**) plus the single SQL file.
-- A **private** team GitHub repository shared with both members, with the marker invited.
+- A public GitHub repository with the full source, database export and documentation:
+  <https://github.com/asdmwq/Prog2002-A3>.
 - A per-member demonstration video (link provided) and a completed peer evaluation form.
 - Project documentation and the Generative AI declaration.

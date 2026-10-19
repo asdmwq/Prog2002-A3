@@ -24,7 +24,7 @@ Open these in the order below and leave them open. Alt+Tab / Taskbar click betwe
    - Tab 5 – Registration page: http://localhost:8080/register.html?id=1
    - Tab 6 – API JSON (active events): http://localhost:3000/api/events
    - Tab 7 – API health: http://localhost:3000/api/health
-   - Tab 8 – **GitHub private repo** (commits page), logged in as `asdmwq`.
+   - Tab 8 – **GitHub repository** (commits page), <https://github.com/asdmwq/Prog2002-A3>, logged in as `asdmwq`.
 4. **Visual Studio Code** with the `PROG2002-A3` folder open. Expand these files in the Explorer so you can click them quickly:
    - `database/charityevents_db.sql`
    - `api/server.js`
@@ -158,10 +158,10 @@ Open these in the order below and leave them open. Alt+Tab / Taskbar click betwe
 
 ### 12:30 – 13:30 · GitHub history, ownership & teamwork
 
-**Show:** Chrome Tab 8 (GitHub private repo). Click **Commits**, scroll the layered commit history (database, API, client, admin, docs). Open one or two commits to show the changed files and clear messages. Show the repository contains the three app folders, the SQL file and the documentation.
+**Show:** Chrome Tab 8 (GitHub repository, <https://github.com/asdmwq/Prog2002-A3>). Click **Commits**, scroll the layered commit history (database, API, client, admin, docs). Open one or two commits to show the changed files and clear messages. Show the repository contains the three app folders, the SQL file and the documentation.
 
 **Say:**
-"All work is tracked in a private GitHub repository with descriptive, layer-based commits — the database, then the API, then the client, then the admin dashboard, then documentation. The repository contains every source file and the documentation. My team member and I each contribute real commits, and we each deploy independently to our own cPanel account. The marker is added as a collaborator."
+"All work is tracked in a public GitHub repository with descriptive, layer-based commits — the database, then the API, then the client, then the admin dashboard, then documentation. The repository contains every source file and the documentation. My team member and I each contribute real commits, and we each deploy independently to our own cPanel account."
 
 **Show (if time):** Briefly click back to VS Code and show your own comments in the route handlers.
 

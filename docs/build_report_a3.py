@@ -275,7 +275,7 @@ para('API base URL (cPanel): [INSERT API URL AFTER DEPLOYMENT]', font='Consolas'
 # 9. Teamwork and Individual Contribution
 # ============================================================
 h1('9. Teamwork and Individual Contribution')
-para('The project reused the HeartBridge client developed in Assignment 2 as the agreed base, which the brief allows by permitting a team to choose one member’s client-side website and extend it. The two members collaborated through a shared private GitHub repository with descriptive, layer-based commits, and each member deploys the applications independently to their own SCU cPanel account as required.')
+para('The project reused the HeartBridge client developed in Assignment 2 as the agreed base, which the brief allows by permitting a team to choose one member’s client-side website and extend it. The two members collaborated through a shared GitHub repository with descriptive, layer-based commits, and each member deploys the applications independently to their own SCU cPanel account as required.')
 make_table(
     ['Member', 'Student ID', 'Main contributions'],
     [
@@ -303,7 +303,8 @@ para('I acknowledge that I have used GenAI tools to complete this assessment. I 
 # 12. GitHub link
 # ============================================================
 h1('12. GitHub Link')
-para('GitHub repository (private, shared with the marker as a collaborator): [INSERT PRIVATE GITHUB REPOSITORY URL]')
+para('The complete project source code for the three Node.js applications, the database export and this documentation are maintained in a public GitHub repository with descriptive, layer-based commits. The repository URL is:')
+para('https://github.com/asdmwq/Prog2002-A3', font='Consolas', size=11)
 
 doc.save(OUT)
 print('Report saved:', OUT)
