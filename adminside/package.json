@@ -1,0 +1,14 @@
+{
+  "name": "heartbridge-events-admin",
+  "version": "1.1.0",
+  "description": "Admin CRUD dashboard for the HeartBridge charity events REST API (pure HTML/CSS/JS) - PROG2002 A3",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "ZhengTao WU (s24832889)",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

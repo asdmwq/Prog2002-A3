@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HeartBridge – Admin Dashboard</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- ======================= top bar ======================= -->
+<header class="topbar">
+  <div class="inner">
+    <a class="brand" href="index.html">
+      <svg class="brand-mark" width="38" height="38" viewBox="0 0 40 40" aria-hidden="true">
+        <rect width="40" height="40" rx="11" fill="#0e7a6b"/>
+        <path d="M20 30s-9.2-5.9-11.4-10.4C7 16.4 8.6 13.4 11.4 13c1.9-.3 3.5.8 4.9 2.2l.2.2.2-.2C18.1 13.8 19.7 12.7 21.6 13c2.8.4 4.4 3.4 2.8 6.6C22.2 24.1 20 30 20 30z" fill="#fff"/>
+        <path d="M13 22.5h14" stroke="#f4c56a" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-text"><strong>HeartBridge</strong><small>Admin Dashboard</small></span>
+    </a>
+    <div class="top-actions">
+      <a class="btn btn-ghost" id="publicLink" href="http://localhost:8080" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14 21 3"/></svg>
+        Open public site
+      </a>
+      <button class="btn btn-primary" id="newEventBtn" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+        New event
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="admin-main">
+  <div class="page-head">
+    <h1>Events management</h1>
+    <p class="muted">Create, update, suspend and delete charity events, and review the registrations for each event.</p>
+  </div>
+
+  <!-- Summary statistics -->
+  <section class="stats" id="stats">
+    <div class="stat-card"><div class="stat-label">Total events</div><div class="stat-value" id="statTotal">–</div></div>
+    <div class="stat-card"><div class="stat-label">Upcoming</div><div class="stat-value stat-up" id="statUpcoming">–</div></div>
+    <div class="stat-card"><div class="stat-label">Past</div><div class="stat-value" id="statPast">–</div></div>
+    <div class="stat-card"><div class="stat-label">Suspended</div><div class="stat-value stat-susp" id="statSuspended">–</div></div>
+    <div class="stat-card"><div class="stat-label">Registrations</div><div class="stat-value" id="statRegs">–</div></div>
+    <div class="stat-card"><div class="stat-label">Tickets sold</div><div class="stat-value" id="statTickets">–</div></div>
+  </section>
+
+  <!-- Events table -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>All events</h2>
+      <div class="table-filter">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#74857d" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="tableSearch" placeholder="Filter by name, city, host…">
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="col-id">ID</th>
+            <th>Event</th>
+            <th>Date</th>
+            <th class="num">Price</th>
+            <th class="num">Raised / Goal</th>
+            <th class="num">Registrations</th>
+            <th>Status</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="eventTable">
+          <tr class="loading-row"><td colspan="8"><div class="spinner"></div></td></tr>
+        </tbody>
+      </table>
+      <div class="table-empty" id="tableEmpty" style="display:none">No events match your filter.</div>
+    </div>
+  </section>
+</main>
+
+<!-- ======================= create / edit modal ======================= -->
+<div class="modal-overlay" id="eventModal">
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <h3 id="modalTitle">New event</h3>
+      <button class="icon-btn" id="closeModal" type="button" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="alert" id="eventFormError"></div>
+
+      <form id="eventForm" novalidate>
+        <fieldset>
+          <legend>Basic details</legend>
+          <div class="field">
+            <label for="fName">Event name *</label>
+            <input type="text" id="fName" maxlength="200" placeholder="e.g. Liuzhou Charity Fun Run">
+          </div>
+          <div class="field">
+            <label for="fDescription">Description *</label>
+            <textarea id="fDescription" rows="3" maxlength="2000" placeholder="Describe what happens at the event…"></textarea>
+          </div>
+          <div class="field">
+            <label for="fPurpose">Purpose *</label>
+            <textarea id="fPurpose" rows="2" maxlength="2000" placeholder="What will the funds be used for?"></textarea>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="fCategory">Category *</label>
+              <select id="fCategory"></select>
+            </div>
+            <div class="field">
+              <label for="fOrg">Organisation *</label>
+              <select id="fOrg"></select>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Schedule &amp; venue</legend>
+          <div class="grid-3">
+            <div class="field">
+              <label for="fDate">Event date *</label>
+              <input type="date" id="fDate">
+            </div>
+            <div class="field">
+              <label for="fStart">Start time *</label>
+              <input type="time" id="fStart">
+            </div>
+            <div class="field">
+              <label for="fEnd">End time *</label>
+              <input type="time" id="fEnd">
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="fLocation">Location *</label>
+              <input type="text" id="fLocation" maxlength="200" placeholder="Venue / street">
+            </div>
+            <div class="field">
+              <label for="fCity">City</label>
+              <input type="text" id="fCity" maxlength="80" placeholder="e.g. Liuzhou">
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Fundraising</legend>
+          <div class="grid-3">
+            <div class="field">
+              <label for="fPrice">Ticket price (¥)</label>
+              <input type="number" id="fPrice" min="0" step="0.01" value="0">
+            </div>
+            <div class="field">
+              <label for="fGoal">Goal amount (¥) *</label>
+              <input type="number" id="fGoal" min="0" step="0.01" value="0">
+            </div>
+            <div class="field">
+              <label for="fRaised">Current amount (¥)</label>
+              <input type="number" id="fRaised" min="0" step="0.01" value="0">
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Map, image &amp; status</legend>
+          <div class="grid-3">
+            <div class="field">
+              <label for="fLat">Latitude</label>
+              <input type="number" id="fLat" step="0.000001" min="-90" max="90" placeholder="24.325600">
+            </div>
+            <div class="field">
+              <label for="fLng">Longitude</label>
+              <input type="number" id="fLng" step="0.000001" min="-180" max="180" placeholder="109.405000">
+            </div>
+            <div class="field">
+              <label for="fImage">Image URL</label>
+              <input type="text" id="fImage" maxlength="500" placeholder="images/fun-run.svg">
+            </div>
+          </div>
+          <label class="check-field">
+            <input type="checkbox" id="fSuspended">
+            <span>Suspend this event (hidden from the public website)</span>
+          </label>
+        </fieldset>
+
+        <!-- Registrations shown only when editing -->
+        <fieldset id="regsFieldset" style="display:none">
+          <legend>Recorded registrations</legend>
+          <div id="editRegs"></div>
+        </fieldset>
+      </form>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-ghost" id="cancelBtn" type="button">Cancel</button>
+      <button class="btn btn-primary" id="saveBtn" type="button">Save event</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= delete confirmation ======================= -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Delete event</h3>
+    </div>
+    <div class="modal-body">
+      <p id="deleteMsg" class="delete-msg">Are you sure you want to delete this event?</p>
+      <div class="alert alert-danger" id="deleteError"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" id="deleteCancel" type="button">Cancel</button>
+      <button class="btn btn-danger" id="confirmDelete" type="button">Delete event</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/config.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
