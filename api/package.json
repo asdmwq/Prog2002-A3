@@ -1,0 +1,20 @@
+{
+  "name": "heartbridge-events-api",
+  "version": "1.1.0",
+  "description": "HeartBridge charity events REST API (Express + MySQL) - Assessment 3: full CRUD plus event registrations.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "author": "ZhengTao WU (s24832889)",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "mysql2": "^3.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
