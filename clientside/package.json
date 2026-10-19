@@ -1,0 +1,12 @@
+{
+  "name": "heartbridge-events-website",
+  "version": "1.0.0",
+  "description": "Client-side charity events website (pure HTML/CSS/JS) for PROG2002 A2",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
