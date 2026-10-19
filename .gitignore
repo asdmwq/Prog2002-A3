@@ -25,3 +25,21 @@ desktop.ini
 
 # MySQL local data (never commit database files)
 mysql-data/
+
+# Generated report render cache (local verification only)
+docs/render-a3/
+
+# A2 legacy files kept locally but not part of the A3 repository
+docs/build_report.py
+docs/build_storyboard.py
+docs/make_erd.py
+docs/make_banners.py
+docs/PROG2002 A2 Report.docx
+docs/PROG2002 A2 Storyboard.docx
+
+# A2-era screenshots and image tiles kept locally; A3 uses only docs/shots/a3/
+docs/shots/_tiles/
+docs/shots/*.png
+
+# Duplicate / intermediate screenshots (byte-identical copy)
+docs/shots/a3/a3-success-check.png
